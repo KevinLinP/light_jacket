@@ -9,7 +9,7 @@ const long INTERVAL = 1000 / FRAMES_PER_SECOND;
 int frame = 0;
 
 byte RED[] = {255, 0, 0};
-byte WHITE[] = {160, 255, 255};
+byte WHITE[] = {220, 255, 255};
 byte BLUE[] = {0, 0, 255};
 
 long previousMillis = 0;
@@ -22,7 +22,7 @@ void setup() {
 void loop() {
   unsigned long currentMillis = millis();
   
-  float brightness = 0.05;
+  float brightness = 0.01;
   byte newRed[] = {RED[0] * brightness, RED[1] * brightness, RED[2] * brightness};
   byte newWhite[] = {WHITE[0] * brightness, WHITE[1] * brightness, WHITE[2] * brightness};
   byte newBlue[] = {BLUE[0] * brightness, BLUE[1] * brightness, BLUE[2] * brightness};
@@ -33,17 +33,20 @@ void loop() {
     incrementFrame();
 
     int color = frame / 90;
-    short flashLocation = -1;
-
-    if (random(1000) < 12) {
-      flashLocation = random(LEDS);
-    }
     
     int n;
     for(n=0; n<LEDS; n++) {
-      if(n == flashLocation) {
-        byte flash[3] = {255, 255, 255};
-        sendColor(flash);
+      if(random(100000) < 250) {
+        //byte intensity = random(123, 255);
+        int i = n + color;
+        if (i % 3 == 0) {
+          sendColor(RED);
+        } else if (i % 3 == 1) {
+          byte mutedWhite[] = {100, 100, 100};
+          sendColor(mutedWhite);
+        } else {
+          sendColor(BLUE);
+        }
       } else {
         int i = n + color;
         if (i % 3 == 0) {
@@ -55,8 +58,6 @@ void loop() {
         }
       }
     }
-
-    flashLocation = -1;
     
     TCL.sendEmptyFrame();
   }
