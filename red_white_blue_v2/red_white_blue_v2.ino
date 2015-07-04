@@ -13,7 +13,6 @@ const byte BLUE = 2;
 const byte MIN_LIFETIME = 2 * FRAMES_PER_SECOND;
 const byte MAX_LIFETIME = 3 * FRAMES_PER_SECOND;
 
-
 byte FULL_RED[] = {255, 0, 0};
 byte FULL_WHITE[] = {255, 255, 255};
 byte FULL_BLUE[] = {0, 0, 255};
@@ -23,9 +22,6 @@ long previousMillis = 0;
 byte ledColor[LEDS];
 byte ledLifetime[LEDS];
 byte ledLifeLeft[LEDS];
-
-float brightness;
-byte tempColor[3];
 
 void setup() {
   TCL.begin();
@@ -48,28 +44,31 @@ void loop() {
 
     byte i;
     for(i = 0; i < LEDS; i++) {
-      brightness = MAX_BRIGHTNESS * ledLifeLeft[i]  / ledLifetime[i];
-      ledLifeLeft[i]--;
+      byte color = ledColor[i];
+      byte lifeLeft = ledLifeLeft[i];
       
-      switch(ledColor[i]) {
+      float brightness = 1.0 * lifeLeft  / ledLifetime[i] * MAX_BRIGHTNESS;
+
+      switch(color) {
         case RED :
-        changeBrightness(FULL_RED, brightness, tempColor);
+        sendColorAndBrightness(FULL_RED, brightness);
         break;
         case WHITE :
-        changeBrightness(FULL_WHITE, brightness, tempColor);
+        sendColorAndBrightness(FULL_WHITE, brightness);
         break;
         case BLUE :
-        changeBrightness(FULL_BLUE, brightness, tempColor);
+        sendColorAndBrightness(FULL_BLUE, brightness);
         break;
       }
-      sendColor(tempColor);
-
-      if (ledLifeLeft[i] == 0) {
-        ledColor[i] = (ledColor[i] + random(1, 3)) % 3;
+      
+      if (lifeLeft == 0) {
+        ledColor[i] = (color + random(1, 3)) % 3;
         byte lifetime = random(MIN_LIFETIME, MAX_LIFETIME);
         ledLifetime[i] = lifetime;
         ledLifeLeft[i] = lifetime;
-      } 
+      } else {
+        ledLifeLeft[i]--;
+      }
     }
    
     
@@ -77,13 +76,6 @@ void loop() {
   }
 }
 
-void sendColor(byte color[3]) {
-  TCL.sendColor(color[0], color[1], color[2]);
+void sendColorAndBrightness(byte color[3], float brightness) {
+  TCL.sendColor(color[0] * brightness, color[1] * brightness, color[2] * brightness);
 }
-
-void changeBrightness(byte oldColor[3], float brightness, byte newColor[3]) {
-  newColor[0] = brightness * oldColor[0];
-  newColor[1] = brightness * oldColor[1];
-  newColor[2] = brightness * oldColor[2];
-}
-
