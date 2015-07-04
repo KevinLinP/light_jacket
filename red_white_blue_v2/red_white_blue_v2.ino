@@ -47,11 +47,11 @@ void loop() {
       byte color = ledColor[i];
       byte lifeLeft = ledLifeLeft[i];
 
-      float brightness;
       if (random(100000) < 125) {
-        sendColor(FULL_WHITE);
+        float brightness = random(50,101) / 100.0;
+        sendColorAndBrightness(FULL_WHITE, brightness);
       } else {
-        brightness = 1.0 * lifeLeft  / ledLifetime[i] * MAX_BRIGHTNESS;
+        float brightness = 1.0 * lifeLeft  / ledLifetime[i] * MAX_BRIGHTNESS;
 
         switch(color) {
         case RED :
@@ -79,10 +79,6 @@ void loop() {
     
     TCL.sendEmptyFrame();
   }
-}
-
-void sendColor(byte color[3]) {
-  TCL.sendColor(color[0], color[1], color[2]);
 }
 
 void sendColorAndBrightness(byte color[3], float brightness) {
