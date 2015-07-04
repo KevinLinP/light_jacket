@@ -8,9 +8,9 @@ const int TOTAL_FRAMES = 270;
 const long INTERVAL = 1000 / FRAMES_PER_SECOND;
 int frame = 0;
 
-byte RED[] = {255, 0, 0};
-byte WHITE[] = {220, 255, 255};
-byte BLUE[] = {0, 0, 255};
+byte FULL_RED[] = {255, 0, 0};
+byte FULL_WHITE[] = {220, 255, 255};
+byte FULL_BLUE[] = {0, 0, 255};
 
 long previousMillis = 0;
 
@@ -23,9 +23,17 @@ void loop() {
   unsigned long currentMillis = millis();
   
   float brightness = 0.01;
-  byte newRed[] = {RED[0] * brightness, RED[1] * brightness, RED[2] * brightness};
-  byte newWhite[] = {WHITE[0] * brightness, WHITE[1] * brightness, WHITE[2] * brightness};
-  byte newBlue[] = {BLUE[0] * brightness, BLUE[1] * brightness, BLUE[2] * brightness};
+  
+  byte red[3];
+  byte white[3];
+  byte blue[3];
+  changeBrightness(FULL_RED, brightness, red);
+  changeBrightness(FULL_WHITE, brightness, white);
+  changeBrightness(FULL_BLUE, brightness, blue);
+
+  byte flashWhite[3];
+  changeBrightness(FULL_WHITE, 0.33333, flashWhite);
+  
   
   if (currentMillis - previousMillis > INTERVAL) {
     previousMillis = currentMillis;
@@ -37,24 +45,26 @@ void loop() {
     int n;
     for(n=0; n<LEDS; n++) {
       if(random(100000) < 250) {
-        //byte intensity = random(123, 255);
+        byte randomBrightness = random(5, 11);
+        float brightness = randomBrightness / 10;
         int i = n + color;
+        
+  
         if (i % 3 == 0) {
-          sendColor(RED);
+          sendColor(FULL_RED);
         } else if (i % 3 == 1) {
-          byte mutedWhite[] = {100, 100, 100};
-          sendColor(mutedWhite);
+          sendColor(flashWhite);
         } else {
-          sendColor(BLUE);
+          sendColor(FULL_BLUE);
         }
       } else {
         int i = n + color;
         if (i % 3 == 0) {
-          sendColor(newRed);
+          sendColor(red);
         } else if (i % 3 == 1) {
-          sendColor(newWhite);
+          sendColor(white);
         } else {
-          sendColor(newBlue);
+          sendColor(blue);
         }
       }
     }
@@ -73,3 +83,10 @@ void incrementFrame() {
 void sendColor(byte color[3]) {
   TCL.sendColor(color[0], color[1], color[2]);
 }
+
+void changeBrightness(byte oldColor[3], float brightness, byte newColor[3]) {
+  newColor[0] = brightness * oldColor[0];
+  newColor[1] = brightness * oldColor[1];
+  newColor[2] = brightness * oldColor[2];
+}
+
