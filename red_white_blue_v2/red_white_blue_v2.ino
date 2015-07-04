@@ -5,7 +5,7 @@ const byte LEDS = 50;
 
 const byte FRAMES_PER_SECOND = 60;
 const long INTERVAL = 1000 / FRAMES_PER_SECOND;
-const float MAX_BRIGHTNESS = 0.5;
+const float MAX_BRIGHTNESS = 0.25;
 
 const byte RED = 0;
 const byte WHITE = 1;
@@ -65,7 +65,7 @@ void loop() {
       sendColor(tempColor);
 
       if (ledLifeLeft[i] == 0) {
-        ledColor[i] = random(0, 3);
+        ledColor[i] = (ledColor[i] + random(1, 3)) % 3;
         byte lifetime = random(MIN_LIFETIME, MAX_LIFETIME);
         ledLifetime[i] = lifetime;
         ledLifeLeft[i] = lifetime;
