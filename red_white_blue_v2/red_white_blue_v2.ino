@@ -5,7 +5,7 @@ const byte LEDS = 50;
 
 const byte FRAMES_PER_SECOND = 60;
 const long INTERVAL = 1000 / FRAMES_PER_SECOND;
-const float MAX_BRIGHTNESS = 0.25;
+const float MAX_BRIGHTNESS = 0.125;
 
 const byte RED = 0;
 const byte WHITE = 1;
@@ -46,10 +46,14 @@ void loop() {
     for(i = 0; i < LEDS; i++) {
       byte color = ledColor[i];
       byte lifeLeft = ledLifeLeft[i];
-      
-      float brightness = 1.0 * lifeLeft  / ledLifetime[i] * MAX_BRIGHTNESS;
 
-      switch(color) {
+      float brightness;
+      if (random(100000) < 125) {
+        sendColor(FULL_WHITE);
+      } else {
+        brightness = 1.0 * lifeLeft  / ledLifetime[i] * MAX_BRIGHTNESS;
+
+        switch(color) {
         case RED :
         sendColorAndBrightness(FULL_RED, brightness);
         break;
@@ -59,8 +63,9 @@ void loop() {
         case BLUE :
         sendColorAndBrightness(FULL_BLUE, brightness);
         break;
+        }
       }
-      
+
       if (lifeLeft == 0) {
         ledColor[i] = (color + random(1, 3)) % 3;
         byte lifetime = random(MIN_LIFETIME, MAX_LIFETIME);
@@ -74,6 +79,10 @@ void loop() {
     
     TCL.sendEmptyFrame();
   }
+}
+
+void sendColor(byte color[3]) {
+  TCL.sendColor(color[0], color[1], color[2]);
 }
 
 void sendColorAndBrightness(byte color[3], float brightness) {
