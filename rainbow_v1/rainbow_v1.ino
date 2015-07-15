@@ -8,7 +8,7 @@
 #define TOP_RIGHT_POT 2
 #define INTERVAL 17
 
-#define MIN_BRIGHTNESS 5
+#define MIN_BRIGHTNESS 2
 
 CRGB linearLeds[NUM_LEDS];
 
@@ -64,6 +64,7 @@ void loop() {
 // based on my light jacket's LED arrangement
 // it'd be nice if GCC unrolled these loops
 void transfer2dPixelsToLinear() {
+  
   for (byte row = 0; row < 5; row++) {
     linearLeds[0 + row] = leds[1 + row][0];
   }
@@ -92,15 +93,15 @@ void transfer2dPixelsToLinear() {
     linearLeds[31 + row] = leds[row][6];
   }
   
-  for (byte row = 0; row < 3; row++) {
+  for (byte row = 0; row < 4; row++) {
     linearLeds[40 - row] = leds[2 + row][7];
   }
   
-  for (byte row = 0; row < 3; row++) {
+  for (byte row = 0; row < 4; row++) {
     linearLeds[41 + row] = leds[2 + row][8];
   }
 
-  for (byte row = 0; row < 3; row++) {
+  for (byte row = 0; row < 5; row++) {
     linearLeds[49 - row] = leds[1 + row][9];
   }
 }
