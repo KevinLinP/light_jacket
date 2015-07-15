@@ -5,9 +5,10 @@
 #define COLUMNS 6
 #define DATA_PIN 1
 #define TOP_LEFT_POT 3
+#define TOP_RIGHT_POT 2
+#define INTERVAL 17
 
-const int INTERVAL = 1000 / 60;
-
+#define MIN_BRIGHTNESS 5
 
 CRGB linearLeds[NUM_LEDS];
 
@@ -28,23 +29,27 @@ void setup() {
 
 
 void loop() {
-  float rawBrightness = (analogRead(TOP_LEFT_POT) >> 2) / 255.0;
-  byte adjustedBrightness = 2 + (pow(rawBrightness, 3) * 253.0);
-  FastLED.setBrightness(adjustedBrightness);
   FastLED.show();
+
+  float rawDitheredBrightness = (analogRead(TOP_LEFT_POT) >> 2) / 255.0;
+  byte ditheredBrightness = MIN_BRIGHTNESS + (pow(rawDitheredBrightness, 2) * (255.0 - MIN_BRIGHTNESS));
+  FastLED.setBrightness(ditheredBrightness);
+
+  float rawColorBrightness = (analogRead(TOP_RIGHT_POT) >> 2) / 255.0;
+  byte colorBrightness = pow(rawColorBrightness, 2) * 255.0;
 
   flashLoop++;
 
   for(byte column = 0; column < COLUMNS; column++) {
     columnHues[column] += 1;
 
-    CHSV hsvColor(columnHues[column], 255, adjustedBrightness);
+    CHSV hsvColor(columnHues[column], 255, colorBrightness);
     CRGB rgbColor;
     hsv2rgb_rainbow(hsvColor, rgbColor);
 
     for(byte row = 0; row < ROWS; row++) {
       if (row == flashLoop) {
-        leds[row][column].setHSV(columnHues[column], 0, 255);
+        leds[row][column].setHSV(0, 0, 255);
       } else {
         leds[row][column] = rgbColor;
       }
