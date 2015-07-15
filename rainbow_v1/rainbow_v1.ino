@@ -1,8 +1,8 @@
 #include "FastLED.h"
 
 #define NUM_LEDS 50
-#define ROWS 10
-#define COLUMNS 6
+#define ROWS 6
+#define COLUMNS 10
 #define DATA_PIN 1
 #define TOP_LEFT_POT 3
 #define TOP_RIGHT_POT 2
@@ -16,8 +16,6 @@ CRGB linearLeds[NUM_LEDS];
 byte columnHues[COLUMNS];
 CRGB leds[ROWS][COLUMNS];
 
-byte flashLoop = COLUMNS;
-
 void setup() {
     FastLED.addLeds<P9813, RGB>(linearLeds, NUM_LEDS);
 
@@ -27,6 +25,7 @@ void setup() {
     }
 }
 
+byte flashLoop = 0;
 byte frameCounter = 0;
 
 void loop() {
@@ -62,6 +61,7 @@ void loop() {
     }
   }
 
+  // TODO: WHY DOES IT RESET THE HUES?!??!
   // TODO: flashloop ring rotates hues.
   if(flashLoop < COLUMNS) {
     for(byte column = 0; column < COLUMNS; column++) {
@@ -75,7 +75,7 @@ void loop() {
 }
 
 // based on my light jacket's LED arrangement
-// it'd be nice if GCC unrolled these loops
+// I wonfer if GCC unrolls these loops
 void transfer2dPixelsToLinear() {
   
   for (byte row = 0; row < 5; row++) {
