@@ -50,22 +50,21 @@ void loop() {
   frameCounter++;
 
   for(byte column = 0; column < COLUMNS; column++) {
-    columnHues[column] += sin8(frameCounter + (column * (256.0 / COLUMNS))) / 255.0 * 5 + 1;
+    //columnHues[column] += sin8(frameCounter + (column * (256.0 / COLUMNS))) / 255.0 * 5 + 1;
+    columnHues[column] += sin8(frameCounter * column) / 255.0 * 4 + 0;
 
-    CHSV hsvColor(columnHues[column], 255, colorBrightness);
+    byte hue = columnHues[column];
+    CHSV hsvColor(hue, 255, colorBrightness);
     CRGB rgbColor;
     hsv2rgb_rainbow(hsvColor, rgbColor);
 
+    // TODO: flashloop ring rotates hues.
     for(byte row = 0; row < ROWS; row++) {
-      leds[row][column] = rgbColor;
-    }
-  }
-
-  // TODO: WHY DOES IT RESET THE HUES?!??!
-  // TODO: flashloop ring rotates hues.
-  if(flashLoop < COLUMNS) {
-    for(byte column = 0; column < COLUMNS; column++) {
-      leds[flashLoop][column].setHSV(0, 0, 255);
+      if(row == flashLoop) {
+        leds[row][column] = CRGB::White;
+      } else {
+        leds[row][column] = rgbColor;
+      }
     }
   }
 
