@@ -6,6 +6,7 @@
 #define DATA_PIN 1
 #define TOP_LEFT_POT 3
 #define TOP_RIGHT_POT 2
+#define BOTTOM_LEFT_POT 0
 #define INTERVAL 17
 
 #define MIN_BRIGHTNESS 2
@@ -26,33 +27,45 @@ void setup() {
     }
 }
 
-
+byte frameCounter = 0;
 
 void loop() {
   FastLED.show();
 
-  float rawDitheredBrightness = (analogRead(TOP_LEFT_POT) >> 2) / 255.0;
+  float rawDitheredBrightness = analogRead(TOP_LEFT_POT) / 1024.0;
   byte ditheredBrightness = MIN_BRIGHTNESS + (pow(rawDitheredBrightness, 2) * (255.0 - MIN_BRIGHTNESS));
   FastLED.setBrightness(ditheredBrightness);
 
-  float rawColorBrightness = (analogRead(TOP_RIGHT_POT) >> 2) / 255.0;
+  float rawColorBrightness = analogRead(TOP_RIGHT_POT) / 1024.0;
   byte colorBrightness = pow(rawColorBrightness, 2) * 255.0;
 
-  flashLoop++;
+  float rawFlashRate = analogRead(BOTTOM_LEFT_POT) / 1024.0;
+  byte flashRate = 10 + (pow(rawFlashRate, 3) * 245);
+
+  // TODO: add randomness time to next flash.
+  if(flashLoop > flashRate) {
+    flashLoop = 0;
+  } else {
+    flashLoop++;
+  }
+  frameCounter++;
 
   for(byte column = 0; column < COLUMNS; column++) {
-    columnHues[column] += 1;
+    columnHues[column] += sin8(frameCounter + (column * (256.0 / COLUMNS))) / 255.0 * 5 + 1;
 
     CHSV hsvColor(columnHues[column], 255, colorBrightness);
     CRGB rgbColor;
     hsv2rgb_rainbow(hsvColor, rgbColor);
 
     for(byte row = 0; row < ROWS; row++) {
-      if (row == flashLoop) {
-        leds[row][column].setHSV(0, 0, 255);
-      } else {
-        leds[row][column] = rgbColor;
-      }
+      leds[row][column] = rgbColor;
+    }
+  }
+
+  // TODO: flashloop ring rotates hues.
+  if(flashLoop < COLUMNS) {
+    for(byte column = 0; column < COLUMNS; column++) {
+      leds[flashLoop][column].setHSV(0, 0, 255);
     }
   }
 
