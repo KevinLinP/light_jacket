@@ -27,6 +27,8 @@ void setup() {
 
 byte flashLoop = 0;
 byte frameCounter = 0;
+byte exceptionCounter = 0;
+byte state = 0;
 
 void loop() {
   FastLED.show();
@@ -42,13 +44,36 @@ void loop() {
   byte flashRate = 10 + (pow(rawFlashRate, 3) * 245);
 
   // TODO: add randomness time to next flash.
-  if(flashLoop > flashRate) {
-    flashLoop = 0;
-  } else {
-    flashLoop++;
+  
+  if (state == 0) {
+    if(flashLoop > flashRate) {
+      flashLoop = 0;
+      state = randomState();
+    } else {
+      flashLoop++;
+    }
   }
+  
   frameCounter++;
 
+  fillRainbowBase(frameCounter, colorBrightness);
+
+  // TODO: flashloop ring rotates hues.
+    // glitch ideas: reverse direction, random new hue, blackout instead, turns all white, turns all black, spiral flash, either direction
+  if (flashLoop < ROWS) {
+    for(byte column = 0; column < COLUMNS; column++) {
+      if (random8() < 100) {
+        leds[flashLoop][column] = CRGB::White;
+      }
+    }
+  }
+  
+  transfer2dPixelsToLinear();
+
+  FastLED.delay(INTERVAL);
+}
+
+void fillRainbowBase(byte frameCounter, byte colorBrightness) {
   for(byte column = 0; column < COLUMNS; column++) {
     //columnHues[column] += sin8(frameCounter + (column * (256.0 / COLUMNS))) / 255.0 * 5 + 1;
     columnHues[column] += sin8(frameCounter * column) / 255.0 * 4 + 0;
@@ -58,20 +83,20 @@ void loop() {
     CRGB rgbColor;
     hsv2rgb_rainbow(hsvColor, rgbColor);
 
-    // TODO: flashloop ring rotates hues.
-    // glitch ideas: reverse direction, random new hue, blackout instead, turns all white, turns all black, spiral flash, either direction
     for(byte row = 0; row < ROWS; row++) {
-      if(row == flashLoop) {
-        leds[row][column] = CRGB::White;
-      } else {
-        leds[row][column] = rgbColor;
-      }
+      leds[row][column] = rgbColor;
     }
   }
+}
 
-  transfer2dPixelsToLinear();
+int randomState() {
+  int randomNum = random8();
 
-  FastLED.delay(INTERVAL);
+  if (randomNum < 25) {
+    return 2;
+  } else {
+    return 1;
+  }
 }
 
 // based on my light jacket's LED arrangement
