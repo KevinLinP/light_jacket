@@ -43,31 +43,34 @@ void loop() {
   float rawFlashRate = analogRead(BOTTOM_LEFT_POT) / 1024.0;
   byte flashRate = 10 + (pow(rawFlashRate, 3) * 245);
 
-  // TODO: add randomness time to next flash.
+  fillRainbowBase(frameCounter, colorBrightness);
   
   if (state == 0) {
-    if(flashLoop > flashRate) {
-      flashLoop = 0;
-      state = randomState();
+    if(flashLoop != 0) {
+      flashLoop--;
     } else {
-      flashLoop++;
+      state = randomState();
+      exceptionCounter = 0;
+      flashLoop = (random8() / 10) + flashRate;
     }
   }
-  
-  frameCounter++;
 
-  fillRainbowBase(frameCounter, colorBrightness);
-
-  // TODO: flashloop ring rotates hues.
+  if (state == 1) {
+    // TODO: flashloop ring rotates hues.
     // glitch ideas: reverse direction, random new hue, blackout instead, turns all white, turns all black, spiral flash, either direction
-  if (flashLoop < ROWS) {
-    for(byte column = 0; column < COLUMNS; column++) {
-      if (random8() < 100) {
-        leds[flashLoop][column] = CRGB::White;
+    if (exceptionCounter < ROWS) {
+      for(byte column = 0; column < COLUMNS; column++) {
+        if (random8() < 100) {
+          leds[exceptionCounter][column] = CRGB::White;
+        }
       }
+    } else {
+      state = 0;
     }
-  }
   
+    exceptionCounter++;
+  }
+
   transfer2dPixelsToLinear();
 
   FastLED.delay(INTERVAL);
@@ -89,8 +92,10 @@ void fillRainbowBase(byte frameCounter, byte colorBrightness) {
   }
 }
 
-int randomState() {
-  int randomNum = random8();
+byte randomState() {
+  return 1;
+  
+  byte randomNum = random8();
 
   if (randomNum < 25) {
     return 2;
