@@ -59,6 +59,7 @@ void loop() {
     hsv2rgb_rainbow(hsvColor, rgbColor);
 
     // TODO: flashloop ring rotates hues.
+    // glitch ideas: reverse direction, random new hue, blackout instead, turns all white, turns all black, spiral flash, either direction
     for(byte row = 0; row < ROWS; row++) {
       if(row == flashLoop) {
         leds[row][column] = CRGB::White;
@@ -74,7 +75,6 @@ void loop() {
 }
 
 // based on my light jacket's LED arrangement
-// I wonfer if GCC unrolls these loops
 void transfer2dPixelsToLinear() {
   
   for (byte row = 0; row < 5; row++) {
