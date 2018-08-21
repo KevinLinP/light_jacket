@@ -1,9 +1,9 @@
 #include "FastLED.h"
 
-#define NUM_LEDS 50
-#define ROWS 6
-#define COLUMNS 10
-#define DATA_PIN 1
+#define NUM_LEDS 100
+#define ROWS 9
+#define COLUMNS 12
+#define DATA_PIN 11
 #define TOP_LEFT_POT 3
 #define TOP_RIGHT_POT 2
 #define BOTTOM_LEFT_POT 0
@@ -17,7 +17,7 @@ byte columnHues[COLUMNS];
 CRGB leds[ROWS][COLUMNS];
 
 void setup() {
-    FastLED.addLeds<P9813, RGB>(linearLeds, NUM_LEDS);
+    FastLED.addLeds<NEOPIXEL, DATA_PIN>(linearLeds, NUM_LEDS);
 
     float hueInterval = 256.0 / COLUMNS;
     for(byte column = 0; column < COLUMNS; column++) {
@@ -44,32 +44,6 @@ void loop() {
   byte flashRate = 10 + (pow(rawFlashRate, 3) * 245);
 
   fillRainbowBase(frameCounter, colorBrightness);
-  
-  if (state == 0) {
-    if(flashLoop != 0) {
-      flashLoop--;
-    } else {
-      state = randomState();
-      exceptionCounter = 0;
-      flashLoop = (random8() / 10) + flashRate;
-    }
-  }
-
-  if (state == 1) {
-    // TODO: flashloop ring rotates hues.
-    // glitch ideas: reverse direction, random new hue, blackout instead, turns all white, turns all black, spiral flash, either direction
-    if (exceptionCounter < ROWS) {
-      for(byte column = 0; column < COLUMNS; column++) {
-        if (random8() < 100) {
-          leds[exceptionCounter][column] = CRGB::White;
-        }
-      }
-    } else {
-      state = 0;
-    }
-  
-    exceptionCounter++;
-  }
 
   transfer2dPixelsToLinear();
 
@@ -107,44 +81,28 @@ byte randomState() {
 // based on my light jacket's LED arrangement
 void transfer2dPixelsToLinear() {
   
-  for (byte row = 0; row < 5; row++) {
-    linearLeds[0 + row] = leds[1 + row][0];
-  }
+  for (byte y = 0; y < ROWS; y++) {
+    linearLeds[8 - y] = leds[y][0];
+    linearLeds[9 + y] = leds[y][1];
 
-  for (byte row = 0; row < 4; row++) {
-    linearLeds[8 - row] = leds[2 + row][1];
-  }
-
-  for (byte row = 0; row < 4; row++) {
-    linearLeds[9 + row] = leds[2 + row][2];
-  }
-
-  for (byte row = 0; row < 6; row++) {
-    linearLeds[18 - row] = leds[row][3];
-  }
-
-  for (byte row = 0; row < 6; row++) {
-    linearLeds[19 + row] = leds[row][4];
-  }
-
-  for (byte row = 0; row < 6; row++) {
-    linearLeds[30 - row] = leds[row][5];
-  }
-  
-  for (byte row = 0; row < 6; row++) {
-    linearLeds[31 + row] = leds[row][6];
-  }
-  
-  for (byte row = 0; row < 4; row++) {
-    linearLeds[40 - row] = leds[2 + row][7];
-  }
-  
-  for (byte row = 0; row < 4; row++) {
-    linearLeds[41 + row] = leds[2 + row][8];
-  }
-
-  for (byte row = 0; row < 5; row++) {
-    linearLeds[49 - row] = leds[1 + row][9];
+    
+    if (y < 7) {
+      linearLeds[24 - y] = leds[y][2];
+      linearLeds[25 + y] = leds[y][3];
+    }
+    
+    linearLeds[40 - y] = leds[y][4];
+    linearLeds[41 + y] = leds[y][5];
+    linearLeds[58 - y] = leds[y][6];
+    linearLeds[59 + y] = leds[y][7];
+    
+    if (y < 7) {
+      linearLeds[74 - y] = leds[y][8];
+      linearLeds[75 + y] = leds[y][9];
+    }
+    
+    linearLeds[89 - y] = leds[y][10];
+    linearLeds[90 + y] = leds[y][11];
   }
 }
 
