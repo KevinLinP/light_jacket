@@ -1,13 +1,13 @@
 #include "FastLED.h"
 
-#define NUM_LEDS 100
-#define Y_LENGTH 9
-#define X_LENGTH 12
+#define NUM_LEDS 50
+#define Y_LENGTH 5
+#define X_LENGTH 10
 #define DATA_PIN 11
 #define TOP_LEFT_POT 3
 #define TOP_RIGHT_POT 2
 #define BOTTOM_LEFT_POT 0
-#define INTERVAL 4
+#define INTERVAL 8
 
 #define MIN_BRIGHTNESS 2
 
@@ -19,8 +19,8 @@ byte speedFactor = 1;
 byte spread  = 10;
 
 void setup() {
-  FastLED.addLeds<NEOPIXEL, DATA_PIN>(linearLeds, NUM_LEDS);
-  FastLED.setCorrection(LEDColorCorrection::TypicalSMD5050);
+  FastLED.addLeds<P9813, RGB>(linearLeds, NUM_LEDS);
+  //FastLED.setCorrection(LEDColorCorrection::TypicalSMD5050);
 }
 
 void loop() {
@@ -31,8 +31,8 @@ void loop() {
   setSpread();
   
   frameCounter++;
-  rotatingRainbow();
-  //sweepingRainbow();
+  //rotatingRainbow();
+  sweepingRainbow();
   transfer2dPixelsToLinear();
 
   FastLED.delay(INTERVAL);
@@ -134,26 +134,19 @@ void rotatingRainbow() {
 void transfer2dPixelsToLinear() {
   
   for (byte y = 0; y < Y_LENGTH; y++) {
-    linearLeds[8 - y] = leds[y][0];
-    linearLeds[9 + y] = leds[y][1];
+    linearLeds[4 - y] = leds[y][0];
+    linearLeds[5 + y] = leds[y][1];
+    
+    linearLeds[14 - y] = leds[y][2];
+    linearLeds[15 + y] = leds[y][3];
+    
+    linearLeds[24 - y] = leds[y][4];
+    linearLeds[25 + y] = leds[y][5];
+    
+    linearLeds[34 - y] = leds[y][6];
+    linearLeds[35 + y] = leds[y][7];
 
-    
-    if (y < 7) {
-      linearLeds[24 - y] = leds[y][2];
-      linearLeds[25 + y] = leds[y][3];
-    }
-    
-    linearLeds[40 - y] = leds[y][4];
-    linearLeds[41 + y] = leds[y][5];
-    linearLeds[58 - y] = leds[y][6];
-    linearLeds[59 + y] = leds[y][7];
-    
-    if (y < 7) {
-      linearLeds[74 - y] = leds[y][8];
-      linearLeds[75 + y] = leds[y][9];
-    }
-    
-    linearLeds[89 - y] = leds[y][10];
-    linearLeds[90 + y] = leds[y][11];
+    linearLeds[44 - y] = leds[y][8];
+    linearLeds[45 + y] = leds[y][9];
   }
 }
