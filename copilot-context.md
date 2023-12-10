@@ -1,0 +1,1 @@
+I am a beginner C developer writing FastLED code that will run in a browser via WASM through emscripten.
