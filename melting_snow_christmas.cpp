@@ -6,6 +6,7 @@
 #define NUM_LEDS 63
 #define GREEN_HUE 120
 #define RED_HUE 0
+#define MINIMUM_BRIGHTNESS 50
 
 uint16_t num_leds_uint16;
 CHSV leds[NUM_LEDS];
@@ -24,7 +25,15 @@ uint8_t random_value() {
 }
 
 uint8_t random_saturation() {
-  return random8() % 224 + 32;
+  return random8() % 128 + 128;
+}
+
+uint8_t random_hue() {
+  if (random8() % 2 == 0) {
+    return GREEN_HUE;
+  } else {
+    return RED_HUE;
+  }
 }
 
 void random_fill() {
@@ -77,10 +86,11 @@ extern "C" {
         uint8_t previous_value = leds[i].value;
         leds[i].value -= speed[i];
 
-        if (leds[i].value > previous_value) {
+        if (leds[i].value < MINIMUM_BRIGHTNESS) {
           speed[i] = random_speed();
           leds[i].saturation = random_saturation();
           leds[i].value = random_value();
+          leds[i].hue = random_hue();
         }
       }
     }
