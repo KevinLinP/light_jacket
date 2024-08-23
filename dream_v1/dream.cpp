@@ -103,7 +103,7 @@ extern "C"
     }
   }
 
-  void loop()
+  void simple_loop()
   {
     uint8_t i = offset;
     for (uint8_t x = 0; x < WIDTH; x++)
@@ -119,7 +119,34 @@ extern "C"
       fill_random_strip_values();
       offset = 0;
     }
+  }
 
+  void smooth_loop()
+  {
+    uint8_t i = offset;
+    for (uint8_t x = 0; x < WIDTH; x++)
+    {
+      if (i >= STRIP_LENGTH)
+      {
+        break;
+      }
+
+      uint8_t value = random_strip_values[i] / 256;
+      leds[x] = CHSV(0, 0, value);
+      i += STRIP_DIVISION_LENGTH;
+    }
+
+    offset++;
+    if (offset >= STRIP_LENGTH)
+    {
+      fill_random_strip_values();
+      offset = 0;
+    }
+  }
+
+  void loop()
+  {
+    smooth_loop();
     // char i = offset_counter;
 
     // for (char y = 0; y < HEIGHT; y++)
@@ -143,4 +170,3 @@ extern "C"
     // mask_persistence_of_vision();
   }
 }
-
