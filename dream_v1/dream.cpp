@@ -12,7 +12,7 @@ CRGB leds_rgb[NUM_LEDS];
 // bool directions[NUM_LEDS];
 // char speed[NUM_LEDS];
 uint8_t persistence_of_version_color_channel;
-uint8_t offset;
+int16_t offset;
 
 #define STRIP_DIVISIONS 5
 #define STRIP_DIVISION_LENGTH 32
@@ -77,7 +77,7 @@ extern "C"
     num_leds_uint16 = (uint16_t)NUM_LEDS;
 
     fill_random_strip_values();
-    offset = 0;
+    offset = -1 * STRIP_LENGTH;
 
     hsv2rgb_rainbow(leds, leds_rgb, NUM_LEDS);
 
@@ -103,36 +103,39 @@ extern "C"
     }
   }
 
-  void simple_loop()
-  {
-    uint8_t i = offset;
-    for (uint8_t x = 0; x < WIDTH; x++)
-    {
-      uint8_t value = random_strip_values[i] / 256;
-      leds[x] = CHSV(0, 0, value);
-      i++;
-    }
+  // void simple_loop()
+  // {
+  //   uint8_t i = offset;
+  //   for (uint8_t x = 0; x < WIDTH; x++)
+  //   {
+  //     uint8_t value = random_strip_values[i] / 256;
+  //     leds[x] = CHSV(0, 0, value);
+  //     i++;
+  //   }
 
-    offset++;
-    if (offset >= STRIP_LENGTH)
-    {
-      fill_random_strip_values();
-      offset = 0;
-    }
-  }
+  //   offset++;
+  //   if (offset >= STRIP_LENGTH)
+  //   {
+  //     fill_random_strip_values();
+  //     offset = 0;
+  //   }
+  // }
 
   void smooth_loop()
   {
-    uint8_t i = offset;
+    int16_t i = offset;
     for (uint8_t x = 0; x < WIDTH; x++)
     {
-      if (i >= STRIP_LENGTH)
+      if (i >= 0 && i < STRIP_LENGTH)
       {
-        break;
+        uint8_t value = random_strip_values[i] / 256;
+        leds[x] = CHSV(0, 0, value);
+      }
+      else
+      {
+        leds[x] = CHSV(0, 0, 0);
       }
 
-      uint8_t value = random_strip_values[i] / 256;
-      leds[x] = CHSV(0, 0, value);
       i += STRIP_DIVISION_LENGTH;
     }
 
@@ -140,7 +143,7 @@ extern "C"
     if (offset >= STRIP_LENGTH)
     {
       fill_random_strip_values();
-      offset = 0;
+      offset = -1 * STRIP_LENGTH;
     }
   }
 
